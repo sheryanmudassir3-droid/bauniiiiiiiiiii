@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bauniii 💕</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Quicksand', sans-serif;
+            overflow: hidden;
+            color: #ffb6c1;
+            cursor: pointer; /* click ke liye hint */
+        }
+        .title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.8rem;
+            background: linear-gradient(135deg, #ffb6c1, #ff69b4, #ff85c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+        .subtitle {
+            font-size: 1rem;
+            color: #ff9ec4;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            opacity: 0.85;
+        }
+        canvas {
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255, 105, 180, 0.3);
+            max-width: 96vw;
+            max-height: 68vh;
+        }
+        .message {
+            margin-top: 22px;
+            font-size: 1.15rem;
+            color: #ffc0cb;
+            opacity: 0.9;
+        }
+        .footer {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: #ff85c0;
+            opacity: 0.75;
+        }
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+        @media (max-width: 600px) {
+            .title { font-size: 2.8rem; }
+            .subtitle { font-size: 0.9rem; }
+            .message { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">bauniii</h1>
+    <p class="subtitle">made with love</p>
+    <canvas id="heartCanvas" width="700" height="700"></canvas>
+    <p class="message">For the one who makes everything softer ✨</p>
+    <p class="footer">💕 forever bauniii 💕</p>
+    
+    <!-- Audio -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="42 - 38 - Golden_Brown_-_The_Stranglers__slowed___reverb_(128k).mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        const music = document.getElementById('bgMusic');
+        
+        // Volume set
+        music.volume = 0.7;
+        
+        // Autoplay try + click fallback
+        function startMusic() {
+            music.play().catch(() => {
+                // Agar autoplay block ho jaye to pehli click pe play
+            });
+        }
+        
+        // Page load pe try karo
+        window.addEventListener('load', startMusic);
+        
+        // Agar block ho to kisi bhi click pe play
+        document.body.addEventListener('click', () => {
+            if (music.paused) {
+                music.play();
+            }
+        }, { once: true });
+        
+        // Touch devices ke liye bhi
+        document.body.addEventListener('touchstart', () => {
+            if (music.paused) {
+                music.play();
+            }
+        }, { once: true });
+        
+        function resize() {
+            const size = Math.min(window.innerWidth * 0.92, window.innerHeight * 0.65, 700);
+            canvas.width = size;
+            canvas.height = size;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+        
+        const colors = ['#ffc0cb', '#ffb6c1', '#ff69b4', '#ff85c0', '#ff9ec4', '#ffb3d1'];
+        const text = "bauniii";
+        const scales = [11, 12, 13, 14, 15, 16, 17];
+        let points = [];
+        let currentIndex = 0;
+        
+        scales.forEach((scale, scaleIdx) => {
+            for (let i = 0; i < 95; i++) {
+                const angle = (i / 95) * Math.PI * 2;
+                const x = 16 * Math.pow(Math.sin(angle), 3) * scale;
+                const y = (13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle)) * scale;
+                points.push({
+                    x: x,
+                    y: y,
+                    color: colors[scaleIdx % colors.length]
+                });
+            }
+        });
+        
+        function draw() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 + 25;
+            const scaleFactor = canvas.width / 520;
+            
+            for (let i = 0; i < currentIndex; i++) {
+                const p = points[i];
+                ctx.fillStyle = p.color;
+                ctx.font = `bold ${Math.max(12, 14 * scaleFactor)}px Quicksand`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.globalAlpha = 0.92;
+                ctx.fillText(text, centerX + p.x * scaleFactor, centerY - p.y * scaleFactor);
+            }
+            
+            if (currentIndex < points.length) {
+                currentIndex += 0.45;
+            } else {
+                setTimeout(() => {
+                    currentIndex = 0;
+                }, 2500);
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
